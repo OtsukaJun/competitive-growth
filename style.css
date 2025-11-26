@@ -1,0 +1,468 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Noto Sans JP", -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
+    background-color: #d4e9f0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.screen {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.screen.hidden {
+    display: none;
+}
+
+.container {
+    width: 100%;
+    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+}
+
+/* Registration Screen */
+.label {
+    color: #373F42;
+    text-align: left;
+    font-family: "Noto Sans JP";
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    width: 519px;
+    align-self: center;
+    margin-top: -56px;
+    margin-bottom: 8px;
+}
+
+.input-field {
+    width: 519px;
+    height: 61px;
+    padding: 0 20px;
+    font-size: 16px;
+    border-radius: 16px;
+    border: 2px solid rgba(50, 173, 230, 0.50);
+    background: #FFF;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.input-field:focus {
+    border-color: #3ba5d4;
+}
+
+.input-field::placeholder {
+    color: #aaa;
+}
+
+/* Start Screen */
+.app-title {
+    font-size: 80px;
+    font-weight: 700;
+    color: #373F42;
+    text-align: center;
+    margin: -32px 0 40px 0;
+}
+
+/* Buttons */
+.btn {
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+    outline: none;
+}
+
+.primary-btn {
+    position: absolute;
+    width: 284px;
+    height: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 48px;
+    background-color: #3ba5d4;
+    color: #FFF;
+    font-family: "Noto Sans JP", sans-serif;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    border-radius: 50px;
+    padding: 16px 24px;
+}
+
+#results-screen .primary-btn {
+    position: static;
+    transform: none;
+    margin-top: 32px;
+}
+
+.primary-btn:hover {
+    background-color: #2d8ab8;
+    box-shadow: 0 4px 12px rgba(59, 165, 212, 0.3);
+}
+
+.primary-btn:active {
+    transform: translateX(-50%) translateY(0);
+}
+
+/* Username Display */
+.username-display {
+    position: fixed;
+    top: 15px;
+    right: 32px;
+    font-size: 16px;
+    color: #373F42;
+    font-weight: 400;
+    z-index: 101;
+}
+
+/* Quiz Screen */
+#quiz-screen {
+    background-color: white;
+    align-items: flex-start;
+}
+
+.quiz-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: white;
+    padding: 15px;
+    text-align: center;
+    font-size: 16px;
+    color: #373F42;
+    border-bottom: 1px solid #e0e0e0;
+    z-index: 100;
+}
+
+#quiz-screen .container {
+    margin-top: 60px;
+}
+
+.word-display {
+    position: relative;
+    z-index: 10;
+    color: #373F42;
+    text-align: center;
+    font-family: "Noto Sans JP", sans-serif;
+    font-size: 80px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    margin: 72px 0 40px 0;
+}
+
+.choices-container {
+    position: absolute;
+    top: 355px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 32px;
+}
+
+.choice-btn {
+    width: 100%;
+    padding: 16px 24px;
+    font-size: 18px;
+    background-color: white;
+    border: 2px solid #d0d0d0;
+    border-radius: 50px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: all 0.3s;
+    outline: none;
+}
+
+.choice-btn:hover {
+    border-color: #3ba5d4;
+    transform: translateX(5px);
+}
+
+.choice-number {
+    color: #999;
+    font-weight: 500;
+    min-width: 20px;
+}
+
+.choice-text {
+    color: #373F42;
+    font-weight: 400;
+}
+
+.choice-btn.correct {
+    background-color: rgba(52, 199, 89, 0.15);
+    border-color: rgba(52, 199, 89, 1);
+}
+
+.choice-btn.incorrect {
+    background-color: rgba(255, 59, 48, 0.15);
+    border-color: rgba(255, 59, 48, 1);
+}
+
+.choice-btn.disabled {
+    pointer-events: none;
+}
+
+/* Results Screen */
+.results-title {
+    color: #373F42;
+    font-family: "Noto Sans JP";
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    width: 1040px;
+    text-align: left;
+    margin-bottom: 12px;
+}
+
+.ranking-title {
+    color: #373F42;
+    font-family: "Noto Sans JP";
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    width: 1040px;
+    text-align: left;
+    margin-top: 24px;
+    margin-bottom: 12px;
+}
+
+.results-card {
+    width: 1040px;
+    background-color: white;
+    border-radius: 16px;
+    padding: 24px 50px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.result-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.result-label {
+    font-family: 'Noto Sans JP';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 24px;
+    line-height: 24px;
+    color: #373F42;
+    border: 2px solid rgba(55, 63, 66, 0.5);
+    padding: 8px 0;
+    border-radius: 8px;
+    width: 128px;
+    text-align: center;
+    background-color: transparent;
+}
+
+.result-value {
+    font-size: 32px;
+    font-weight: 600;
+    color: #373F42;
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+}
+
+.result-number {
+    font-size: 48px;
+}
+
+#total-count-fraction {
+    font-size: 32px;
+    font-weight: 600;
+}
+
+.ranking-card {
+    width: 1040px;
+    background-color: white;
+    border-radius: 16px;
+    padding: 24px 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.rank-display {
+    text-align: center;
+    font-size: 24px;
+    color: #373F42;
+    margin-top: -8px;
+    margin-bottom: 6px;
+}
+
+.rank-number {
+    font-size: 64px;
+    font-weight: 700;
+    color: #373F42;
+}
+
+.rank-total {
+    font-size: 20px;
+    color: #373F42;
+    margin-left: 10px;
+}
+
+.ranking-list {
+    width: 567px;
+    height: 214px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border-top: 2px dotted #ccc;
+    padding-top: 20px;
+    scroll-behavior: smooth;
+}
+
+.ranking-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.ranking-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.ranking-list::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.ranking-list::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+.ranking-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 20px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.ranking-item:last-child {
+    border-bottom: none;
+}
+
+.ranking-item.current-user {
+    background-color: rgba(59, 165, 212, 0.05);
+    border-bottom: 3px solid #3ba5d4;
+}
+
+.ranking-item-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.ranking-position {
+    font-size: 18px;
+    color: #999;
+    min-width: 20px;
+}
+
+.ranking-name {
+    font-size: 18px;
+    color: #373F42;
+}
+
+.ranking-score {
+    font-size: 18px;
+    color: #373F42;
+    font-weight: 500;
+}
+
+/* Level Up Screen */
+.trophy-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 60px 0 0 0;
+}
+
+.trophy-image {
+    width: 304px;
+    height: 304px;
+    object-fit: contain;
+}
+
+.levelup-text {
+    color: #373F42;
+    text-align: center;
+    font-family: "Noto Sans JP";
+    font-size: 32px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    margin-top: 24px;
+    margin-bottom: 40px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .app-title {
+        font-size: 36px;
+    }
+
+    .word-display {
+        font-size: 42px;
+    }
+
+    .results-card, .ranking-card {
+        flex-direction: column;
+        gap: 30px;
+        padding: 30px 20px;
+    }
+
+    .result-value {
+        font-size: 28px;
+    }
+
+    .result-number {
+        font-size: 40px;
+    }
+    
+    .rank-number {
+        font-size: 48px;
+    }
+    
+    .rank-total {
+        font-size: 16px;
+    }
+    
+    .ranking-item {
+        padding: 12px 15px;
+    }
+    
+    .ranking-position, .ranking-name, .ranking-score {
+        font-size: 16px;
+    }
+}

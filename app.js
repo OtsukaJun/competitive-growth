@@ -1,0 +1,1074 @@
+// Parse CSV and create vocabulary data
+function parseQuizCSV(csvText) {
+    const lines = csvText.trim().split('\n');
+    const questions = [];
+    
+    // Skip header row
+    for (let i = 1; i < lines.length; i++) {
+        const parts = lines[i].split(',');
+        if (parts.length >= 6) {
+            const word = parts[1];
+            const choices = [parts[2], parts[3], parts[4], parts[5]];
+            const correctIndex = parseInt(parts[6]) - 1; // Convert 1-4 to 0-3
+            
+            const correct = choices[correctIndex];
+            const options = choices.filter((_, idx) => idx !== correctIndex);
+            
+            questions.push({
+                word: word,
+                correct: correct,
+                options: options
+            });
+        }
+    }
+    
+    return questions;
+}
+
+// Embedded CSV data (500 questions)
+const quizCSVData = `ID,Question(English),Choice1,Choice2,Choice3,Choice4,CorrectOption
+1,stay up late,見てみる・チェックする,（用紙に）書き込む,夜更かしする,〜に頼る・依存する,3
+2,go back,戻る,〜とうまくやる,話す,〜に頼る・依存する,1
+3,wash,洗う,見る（じっと）,確認する,遊ぶ・ぶらぶらする,1
+4,watch,理解する,見る（じっと）,終える,脱ぐ・離陸する,2
+5,spend,シャットダウンする,うまくいく・解決する,戻る,（時間・お金を）使う,4
+6,agree with,欲しいと思う,立ち寄る,提出する,〜に同意する,4
+7,know,勉強する,登録する,知っている,見る,3
+8,pick someone up,〜を迎えに行く,〜とうまくやる,話す（言語）,〜を心配する,1
+9,tell,脱ぐ・離陸する,見つける,伝える,節約する・保存する,3
+10,go to bed,〜を迎えに行く,食べる,シャットダウンする,寝る,4
+11,live,使う,住む,落ち着く,戻る,2
+12,belong to,乗り込む・入る,〜に所属する,見てみる・チェックする,見る（じっと）,2
+13,drop someone off,〜を降ろす,拾う・迎えに行く,試す,手に入れる,1
+14,wait,〜を起こす,寝る,乗り込む・入る,待つ,4
+15,get tired,シャットダウンする,〜について考える,来る,疲れる,4
+16,eat,来る,〜に所属する,食べる,聞く,3
+17,grow up,早起きする,忘れる,〜とうまくやる,成長する,4
+18,wake someone up,早起きする,〜を起こす,伝える,売る,2
+19,try,拾う・迎えに行く,待つ,与える,試す,4
+20,run into,言う,偶然出会う,聞く,音量を下げる・断る,2
+21,know,知っている,成長する,話す（言語）,売る,1
+22,meet,見る,チェックインする,聞く,会う,4
+23,log out,アプリにログインする,ログアウトする,開ける,提出する,2
+24,go,乗り込む・入る,（用紙に）書き込む,行く,見てみる・チェックする,3
+25,meet,会う,成長する,する,（電源を）消す,1
+26,get off,疲れる,理解する,（電源を）つける,降りる,4
+27,think about,理解する,元気づける,寝る,〜について考える,4
+28,talk,話す,〜を心配する,洗う,使う,1
+29,cook,料理する,〜について考える,使う,中止する,1
+30,take a break,降りる,休憩する,在宅勤務をする,旅行する,2
+31,open up,打ち明ける,尋ねる,待つ,延期する,1
+32,feel sick,うまくいく・解決する,会う,気分が悪い,脱ぐ・離陸する,3
+33,look,見る,尋ねる,〜に同意する,〜を迎えに行く,1
+34,see,座る,わかる・見つけ出す,電話する,見る,4
+35,work from home,在宅勤務をする,洗う,世話をする,早起きする,1
+36,work out,見る,うまくいく・解決する,準備をする,登録する,2
+37,hear,聞こえる,休憩する,現れる・音量を上げる,配る,1
+38,work from home,洗う,（電源を）つける,在宅勤務をする,立ち上がる,3
+39,try,試す,〜に同意する,寝る,スピードを落とす,1
+40,meet,乗る,現れる・音量を上げる,会う,住む,3
+41,clean,掃除する,（電源を）つける,飲む,書き留める,1
+42,belong to,起床する,わかる・見つけ出す,〜に所属する,知っている,3
+43,hand in,延期する,忘れる,提出する,尋ねる,3
+44,go,行く,持っている,戻る,身に着ける,1
+45,take care of,（お金が）かかる,別れる,世話をする,与える,3
+46,shut down,〜について考える,降りる,シャットダウンする,わかる・見つけ出す,3
+47,understand,故障する,外出する,理解する,（電源を）つける,3
+48,look for,見る,戻ってくる,探す,手伝う,3
+49,cook,見てみる・チェックする,料理する,現れる・音量を上げる,持っている,2
+50,slow down,飲む,世話をする,提出する,スピードを落とす,4
+51,fall asleep,起きる,座る,〜を迎えに行く,眠りに落ちる,4
+52,save,別れる,節約する・保存する,〜に頼る・依存する,試す,2
+53,break down,打ち明ける,見る,〜に同意する,故障する,4
+54,turn down,世話をする,確認する,音量を下げる・断る,理解する,3
+55,pick someone up,立ち寄る,疲れる,伝える,〜を迎えに行く,4
+56,forget,洗う,忘れる,身に着ける,起きる,2
+57,go out,提出する,〜を迎えに行く,外出する,買う,3
+58,have,持っている,聞く,立ち上がる,食べる,1
+59,cost,起きる,（お金が）かかる,スピードを落とす,わかる・見つけ出す,2
+60,cost,ログアウトする,（用紙に）書き込む,ログインする,（お金が）かかる,4
+61,see,拾う・迎えに行く,設定する・準備する,見る,欲しいと思う,3
+62,check it out,アプリにログインする,設定する・準備する,見てみる・チェックする,ログアウトする,3
+63,close,チェックインする,探す,閉める,休憩する,3
+64,look forward to,チェックアウトする,節約する・保存する,〜を楽しみにする,学ぶ,3
+65,get in,来る,確認する,乗り込む・入る,学ぶ,3
+66,go back,成長する,戻る,支払う,見る,2
+67,hear,〜に同意する,始める,探す,聞こえる,4
+68,look,見る,現れる,掃除する,打ち明ける,1
+69,get ready,準備をする,覚えている,〜を降ろす,終える,1
+70,pay,乗り込む・入る,開ける,シャットダウンする,支払う,4
+71,move,聞こえる,必要とする,支払う,動く・引っ越す,4
+72,hand in,住む,提出する,〜を楽しみにする,チェックインする,2
+73,wake up,聞く,確認する,起きる,（電源を）消す,3
+74,pick someone up,落ち着く,拾う・迎えに行く,〜を迎えに行く,住む,3
+75,wash,理解する,洗う,開ける,元気づける,2
+76,get,動く・引っ越す,確認する,〜に同意する,手に入れる,4
+77,learn,気分が悪い,学ぶ,料理する,〜を迎えに行く,2
+78,check,立ち寄る,〜を心配する,降りる,確認する,4
+79,look after,現れる,売る,世話をする,降りる,3
+80,cost,閉める,（お金が）かかる,延期する,〜を心配する,2
+81,shut down,見る,理解する,買う,シャットダウンする,4
+82,remember,現れる,（用紙に）書き込む,覚えている,聞く,3
+83,get ready,理解する,電話する,準備をする,見る,3
+84,drop someone off,外出する,会う,〜を降ろす,話す,3
+85,put on,身に着ける,早起きする,動く・引っ越す,旅行する,1
+86,understand,試す,座る,理解する,〜とうまくやる,3
+87,help,手伝う,ログアウトする,忘れる,来る,1
+88,put off,座る,立ち寄る,延期する,食べる,3
+89,carry out,世話をする,乗り込む・入る,実行する,元気づける,3
+90,make,見つける,作る,座る,わかる・見つけ出す,2
+91,hurry up,〜に頼る・依存する,在宅勤務をする,シャットダウンする,急ぐ,4
+92,feel sick,手伝う,気分が悪い,延期する,取る・連れて行く,2
+93,call,電話する,見る,言う,支払う,1
+94,study,別れる,探す,勉強する,知っている,3
+95,sell,戻ってくる,売る,支払う,言う,2
+96,save,〜に同意する,節約する・保存する,（用紙に）書き込む,気分が悪い,2
+97,talk,料理する,〜を楽しみにする,話す,〜に所属する,3
+98,go,延期する,行く,成長する,必要とする,2
+99,know,拾う・迎えに行く,動く・引っ越す,知っている,ログインする,3
+100,eat,気分が悪い,必要とする,うまくいく・解決する,食べる,4
+101,break down,故障する,音量を下げる・断る,伝える,座る,1
+102,drop someone off,乗る,持っている,〜を降ろす,アプリにログインする,3
+103,slow down,気分が悪い,必要とする,実行する,スピードを落とす,4
+104,finish,（お金が）かかる,買う,終える,立ち上がる,3
+105,open,始める,提出する,開ける,忘れる,3
+106,break down,使う,身に着ける,立ち上がる,故障する,4
+107,know,知っている,（時間・お金を）使う,会う,寝る,1
+108,log in to the app,実行する,アプリにログインする,見る（じっと）,勉強する,2
+109,close,閉める,会う,戻ってくる,理解する,1
+110,put on,延期する,身に着ける,料理する,話す,2
+111,give,与える,（電源を）つける,（電源を）消す,中止する,1
+112,call,うまくいく・解決する,電話する,実行する,起きる,2
+113,open,尋ねる,開ける,乗り込む・入る,中止する,2
+114,get in,登録する,理解する,話す（言語）,乗り込む・入る,4
+115,pick up,見る（じっと）,行く,始める,拾う・迎えに行く,4
+116,check it out,見てみる・チェックする,手伝う,遊ぶ・ぶらぶらする,スピードを落とす,1
+117,get off,飲む,降りる,音量を下げる・断る,わかる・見つけ出す,2
+118,drop by,実行する,元気づける,立ち寄る,来る,3
+119,pay,話題に出す・育てる,起床する,作る,支払う,4
+120,pick up,延期する,元気づける,手伝う,拾う・迎えに行く,4
+121,think,（お金が）かかる,提出する,伝える,考える,4
+122,move,動く・引っ越す,料理する,遊ぶ・ぶらぶらする,手に入れる,1
+123,save,書き留める,寝る,開ける,節約する・保存する,4
+124,ask,アプリにログインする,〜を降ろす,理解する,尋ねる,4
+125,open,戻ってくる,開ける,〜を心配する,確認する,2
+126,talk,座る,会う,提出する,話す,4
+127,check it out,降りる,現れる・音量を上げる,動く・引っ越す,見てみる・チェックする,4
+128,log in to the app,気分が悪い,売る,アプリにログインする,わかる・見つけ出す,3
+129,turn off,実行する,旅行する,（電源を）消す,元気づける,3
+130,look for,偶然出会う,探す,世話をする,在宅勤務をする,2
+131,try,書き留める,現れる,試す,立ち上がる,3
+132,get along with,理解する,〜とうまくやる,滞在する,作る,2
+133,get ready,〜に同意する,身に着ける,アプリにログインする,準備をする,4
+134,hand in,提出する,乗り込む・入る,聞く,登録する,1
+135,stay up late,待つ,夜更かしする,現れる,（時間・お金を）使う,2
+136,turn up,話す,言う,設定する・準備する,現れる・音量を上げる,4
+137,listen,聞く,言う,（電源を）つける,欲しいと思う,1
+138,grow up,成長する,夜更かしする,〜を降ろす,忘れる,1
+139,learn,落ち着く,登録する,学ぶ,話す,3
+140,look after,眠りに落ちる,買う,偶然出会う,世話をする,4
+141,wait,落ち着く,待つ,乗る,立ち上がる,2
+142,buy,使う,必要とする,理解する,買う,4
+143,check in,チェックインする,する,乗り込む・入る,手に入れる,1
+144,think,考える,飲む,作る,身に着ける,1
+145,cook,始める,立ち上がる,（電源を）つける,料理する,4
+146,calm down,手に入れる,世話をする,落ち着く,見てみる・チェックする,3
+147,go to bed,探す,寝る,延期する,実行する,2
+148,cheer up,元気づける,早起きする,終える,する,1
+149,find out,現れる,〜とうまくやる,住む,わかる・見つけ出す,4
+150,check out,チェックアウトする,乗り越える,アプリにログインする,買う,1
+151,break up,開ける,学ぶ,別れる,現れる・音量を上げる,3
+152,travel,〜を降ろす,旅行する,見つける,取る・連れて行く,2
+153,come,旅行する,疲れる,来る,売る,3
+154,log out,使う,支払う,ログアウトする,世話をする,3
+155,talk,元気づける,開ける,話す,掃除する,3
+156,know,〜を降ろす,知っている,〜に所属する,チェックアウトする,2
+157,put on,身に着ける,（時間・お金を）使う,尋ねる,現れる,1
+158,get up,スピードを落とす,世話をする,起床する,言う,3
+159,open,眠りに落ちる,開ける,尋ねる,偶然出会う,2
+160,log out,ログアウトする,知っている,早起きする,言う,1
+161,get in,探す,確認する,乗り込む・入る,準備をする,3
+162,break up,別れる,開ける,早起きする,準備をする,1
+163,find out,忘れる,わかる・見つけ出す,理解する,話す（言語）,2
+164,log in to the app,アプリにログインする,（電源を）消す,待つ,〜を迎えに行く,1
+165,buy,買う,準備をする,（電源を）消す,覚えている,1
+166,get up,元気づける,降りる,知っている,起床する,4
+167,try,遊ぶ・ぶらぶらする,試す,寝る,会う,2
+168,turn down,音量を下げる・断る,書き留める,身に着ける,ログインする,1
+169,make,動く・引っ越す,飲む,立ち上がる,作る,4
+170,shut down,話す,元気づける,言う,シャットダウンする,4
+171,have,旅行する,音量を下げる・断る,ログアウトする,持っている,4
+172,sell,〜とうまくやる,売る,チェックインする,立ち上がる,2
+173,take off,世話をする,脱ぐ・離陸する,聞く,見つける,2
+174,watch,起床する,見る（じっと）,理解する,急ぐ,2
+175,drop someone off,伝える,〜を起こす,寝る,〜を降ろす,4
+176,sign up,世話をする,忘れる,登録する,（時間・お金を）使う,3
+177,get along with,覚えている,戻る,〜とうまくやる,忘れる,3
+178,understand,チェックアウトする,理解する,見つける,滞在する,2
+179,check out,売る,チェックアウトする,現れる,支払う,2
+180,grow up,脱ぐ・離陸する,成長する,旅行する,現れる,2
+181,hurry up,〜を起こす,開ける,うまくいく・解決する,急ぐ,4
+182,eat,シャットダウンする,登録する,する,食べる,4
+183,turn on,見てみる・チェックする,（電源を）つける,戻る,見る（じっと）,2
+184,belong to,現れる,聞く,立ち上がる,〜に所属する,4
+185,take off,脱ぐ・離陸する,偶然出会う,（電源を）つける,〜について考える,1
+186,find,中止する,見つける,起床する,手伝う,2
+187,get along with,〜とうまくやる,滞在する,シャットダウンする,欲しいと思う,1
+188,start,偶然出会う,取る・連れて行く,（電源を）つける,始める,4
+189,hang out,料理する,見つける,遊ぶ・ぶらぶらする,開ける,3
+190,get tired,世話をする,〜について考える,疲れる,提出する,3
+191,write down,書き留める,待つ,話す,〜とうまくやる,1
+192,go,節約する・保存する,行く,試す,打ち明ける,2
+193,close,閉める,ログインする,話す（言語）,座る,1
+194,belong to,中止する,〜に所属する,遊ぶ・ぶらぶらする,支払う,2
+195,write down,起きる,聞こえる,（時間・お金を）使う,書き留める,4
+196,slow down,スピードを落とす,戻る,シャットダウンする,書き留める,1
+197,calm down,（電源を）消す,乗り込む・入る,遊ぶ・ぶらぶらする,落ち着く,4
+198,come back,わかる・見つけ出す,戻ってくる,忘れる,終える,2
+199,clean,伝える,掃除する,世話をする,探す,2
+200,finish,閉める,起きる,外出する,終える,4
+201,remember,覚えている,寝る,準備をする,気分が悪い,1
+202,hurry up,する,急ぐ,住む,開ける,2
+203,study,滞在する,勉強する,尋ねる,（電源を）消す,2
+204,break up,来る,別れる,座る,音量を下げる・断る,2
+205,help,乗り越える,手伝う,開ける,作る,2
+206,cook,料理する,世話をする,探す,聞く,1
+207,wake someone up,支払う,試す,〜を起こす,理解する,3
+208,remember,覚えている,アプリにログインする,始める,聞く,1
+209,break down,支払う,故障する,開ける,掃除する,2
+210,turn down,閉める,開ける,作る,音量を下げる・断る,4
+211,hear,聞こえる,食べる,起きる,忘れる,1
+212,have,来る,持っている,乗り込む・入る,登録する,2
+213,bring up,中止する,書き留める,食べる,話題に出す・育てる,4
+214,do,旅行する,終える,する,起きる,3
+215,take off,〜を迎えに行く,旅行する,脱ぐ・離陸する,打ち明ける,3
+216,drop someone off,見る,落ち着く,〜を降ろす,〜に同意する,3
+217,want,書き留める,旅行する,音量を下げる・断る,欲しいと思う,4
+218,look after,わかる・見つけ出す,来る,言う,世話をする,4
+219,check out,起きる,ログインする,チェックアウトする,待つ,3
+220,sit down,疲れる,伝える,座る,閉める,3
+221,meet,乗り越える,会う,ログアウトする,〜に同意する,2
+222,turn on,勉強する,（電源を）つける,欲しいと思う,見てみる・チェックする,2
+223,want,乗り越える,欲しいと思う,シャットダウンする,作る,2
+224,shut down,元気づける,現れる・音量を上げる,シャットダウンする,夜更かしする,3
+225,fill out,〜に所属する,（用紙に）書き込む,登録する,（お金が）かかる,2
+226,come,〜を心配する,スピードを落とす,来る,休憩する,3
+227,look for,現れる,旅行する,登録する,探す,4
+228,call,落ち着く,〜を心配する,話題に出す・育てる,電話する,4
+229,cook,在宅勤務をする,料理する,起床する,会う,2
+230,put on,中止する,身に着ける,理解する,与える,2
+231,agree with,〜に同意する,戻る,忘れる,うまくいく・解決する,1
+232,get ready,準備をする,する,〜に同意する,学ぶ,1
+233,drop someone off,〜を降ろす,提出する,伝える,洗う,1
+234,wash,〜を降ろす,スピードを落とす,節約する・保存する,洗う,4
+235,close,閉める,見る（じっと）,シャットダウンする,手に入れる,1
+236,meet,聞こえる,会う,脱ぐ・離陸する,理解する,2
+237,put off,覚えている,チェックアウトする,延期する,話題に出す・育てる,3
+238,fall asleep,夜更かしする,眠りに落ちる,見る（じっと）,聞こえる,2
+239,carry out,（時間・お金を）使う,考える,成長する,実行する,4
+240,want,考える,伝える,〜に所属する,欲しいと思う,4
+241,write down,準備をする,（時間・お金を）使う,書き留める,スピードを落とす,3
+242,open,戻る,開ける,ログインする,立ち寄る,2
+243,finish,スピードを落とす,来る,終える,〜を降ろす,3
+244,call off,ログインする,中止する,旅行する,聞こえる,2
+245,break down,見る,（用紙に）書き込む,故障する,覚えている,3
+246,put on,起床する,見る,〜を起こす,身に着ける,4
+247,travel,〜を楽しみにする,電話する,（用紙に）書き込む,旅行する,4
+248,drop by,立ち寄る,考える,聞こえる,夜更かしする,1
+249,come back,戻ってくる,会う,待つ,偶然出会う,1
+250,carry out,実行する,節約する・保存する,（用紙に）書き込む,する,1
+251,get over,始める,待つ,乗り越える,中止する,3
+252,drop by,世話をする,音量を下げる・断る,立ち寄る,外出する,3
+253,depend on,遊ぶ・ぶらぶらする,座る,〜に頼る・依存する,見てみる・チェックする,3
+254,hand in,降りる,尋ねる,提出する,夜更かしする,3
+255,stay up late,アプリにログインする,夜更かしする,拾う・迎えに行く,提出する,2
+256,feel sick,在宅勤務をする,気分が悪い,開ける,起きる,2
+257,go to bed,〜とうまくやる,料理する,夜更かしする,寝る,4
+258,live,急ぐ,（電源を）つける,住む,提出する,3
+259,sign up,うまくいく・解決する,登録する,話す（言語）,待つ,2
+260,wait,〜を心配する,立ち寄る,〜を楽しみにする,待つ,4
+261,go,〜に所属する,ログアウトする,行く,眠りに落ちる,3
+262,set up,戻ってくる,配る,聞こえる,設定する・準備する,4
+263,calm down,在宅勤務をする,住む,成長する,落ち着く,4
+264,bring up,旅行する,話題に出す・育てる,行く,遊ぶ・ぶらぶらする,2
+265,speak,与える,チェックインする,話す（言語）,話す,3
+266,use,食べる,うまくいく・解決する,使う,試す,3
+267,set up,会う,設定する・準備する,考える,打ち明ける,2
+268,log in,うまくいく・解決する,落ち着く,ログインする,わかる・見つけ出す,3
+269,cost,提出する,落ち着く,（お金が）かかる,準備をする,3
+270,hand in,〜に頼る・依存する,疲れる,提出する,気分が悪い,3
+271,take,行く,取る・連れて行く,身に着ける,作る,2
+272,get in,乗り込む・入る,起床する,故障する,行く,1
+273,shut down,話す（言語）,配る,起床する,シャットダウンする,4
+274,worry about,〜を心配する,掃除する,話す,座る,1
+275,save,（電源を）つける,取る・連れて行く,急ぐ,節約する・保存する,4
+276,get on,欲しいと思う,見る,乗る,落ち着く,3
+277,live,使う,住む,立ち寄る,起きる,2
+278,go to bed,座る,尋ねる,急ぐ,寝る,4
+279,wake someone up,〜を起こす,眠りに落ちる,使う,聞こえる,1
+280,take care of,設定する・準備する,来る,旅行する,世話をする,4
+281,stay,滞在する,理解する,現れる,学ぶ,1
+282,open up,必要とする,〜を楽しみにする,打ち明ける,故障する,3
+283,find out,配る,忘れる,〜を降ろす,わかる・見つけ出す,4
+284,put on,身に着ける,世話をする,伝える,会う,1
+285,worry about,（時間・お金を）使う,〜を心配する,偶然出会う,拾う・迎えに行く,2
+286,use,終える,与える,使う,疲れる,3
+287,wake up,行く,降りる,起きる,学ぶ,3
+288,spend,〜とうまくやる,（時間・お金を）使う,伝える,動く・引っ越す,2
+289,come back,探す,スピードを落とす,眠りに落ちる,戻ってくる,4
+290,finish,旅行する,見つける,終える,持っている,3
+291,check out,滞在する,〜を心配する,洗う,チェックアウトする,4
+292,put off,（電源を）消す,延期する,始める,〜を心配する,2
+293,need,理解する,必要とする,気分が悪い,乗り込む・入る,2
+294,find out,〜を心配する,〜について考える,会う,わかる・見つけ出す,4
+295,look,チェックアウトする,夜更かしする,見る,見る（じっと）,3
+296,come back,偶然出会う,戻ってくる,〜を起こす,忘れる,2
+297,close,〜を楽しみにする,手に入れる,閉める,準備をする,3
+298,feel sick,アプリにログインする,行く,気分が悪い,拾う・迎えに行く,3
+299,open,急ぐ,旅行する,〜とうまくやる,開ける,4
+300,come back,理解する,旅行する,戻ってくる,手伝う,3
+301,go back,戻る,持っている,忘れる,欲しいと思う,1
+302,forget,設定する・準備する,見る,〜を心配する,忘れる,4
+303,shut down,手に入れる,シャットダウンする,聞こえる,考える,2
+304,get in,乗り込む・入る,見る,始める,書き留める,1
+305,get along with,〜を迎えに行く,〜とうまくやる,外出する,音量を下げる・断る,2
+306,drink,元気づける,買う,話す,飲む,4
+307,check,落ち着く,確認する,〜について考える,〜に同意する,2
+308,bring up,音量を下げる・断る,勉強する,話題に出す・育てる,行く,3
+309,check it out,見てみる・チェックする,〜に頼る・依存する,外出する,わかる・見つけ出す,1
+310,hear,聞こえる,使う,遊ぶ・ぶらぶらする,元気づける,1
+311,go,話題に出す・育てる,試す,戻る,行く,4
+312,wake up early,行く,立ち寄る,探す,早起きする,4
+313,call,電話する,見る,〜を起こす,食べる,1
+314,pay,支払う,（時間・お金を）使う,世話をする,延期する,1
+315,forget,言う,偶然出会う,休憩する,忘れる,4
+316,run into,身に着ける,偶然出会う,終える,遊ぶ・ぶらぶらする,2
+317,find out,身に着ける,行く,わかる・見つけ出す,チェックインする,3
+318,drop by,立ち寄る,乗る,アプリにログインする,作る,1
+319,meet,夜更かしする,話題に出す・育てる,会う,（電源を）消す,3
+320,slow down,スピードを落とす,〜に同意する,在宅勤務をする,節約する・保存する,1
+321,hand in,（お金が）かかる,提出する,シャットダウンする,立ち上がる,2
+322,tell,伝える,する,住む,考える,1
+323,study,勉強する,食べる,する,眠りに落ちる,1
+324,drink,見る,聞く,立ち寄る,飲む,4
+325,break down,遊ぶ・ぶらぶらする,〜に同意する,故障する,見る,3
+326,get on,確認する,洗う,必要とする,乗る,4
+327,watch,話す（言語）,延期する,寝る,見る（じっと）,4
+328,look after,聞く,世話をする,降りる,学ぶ,2
+329,take a break,見つける,〜とうまくやる,乗り越える,休憩する,4
+330,break up,電話する,使う,別れる,在宅勤務をする,3
+331,get ready,書き留める,準備をする,必要とする,開ける,2
+332,wake someone up,滞在する,電話する,〜を起こす,確認する,3
+333,sign up,伝える,見る,登録する,降りる,3
+334,wait,設定する・準備する,立ち上がる,話す（言語）,待つ,4
+335,find,チェックインする,（お金が）かかる,見つける,聞く,3
+336,get in,〜を起こす,乗り込む・入る,洗う,確認する,2
+337,go to bed,節約する・保存する,寝る,（時間・お金を）使う,急ぐ,2
+338,take care of,うまくいく・解決する,〜を心配する,会う,世話をする,4
+339,slow down,シャットダウンする,スピードを落とす,見る（じっと）,〜とうまくやる,2
+340,need,起床する,〜を楽しみにする,必要とする,書き留める,3
+341,check,確認する,実行する,必要とする,ログインする,1
+342,finish,身に着ける,うまくいく・解決する,終える,手伝う,3
+343,pay,支払う,配る,起きる,準備をする,1
+344,grow up,（用紙に）書き込む,現れる,見つける,成長する,4
+345,have,持っている,会う,住む,起きる,1
+346,cheer up,落ち着く,〜を楽しみにする,元気づける,戻ってくる,3
+347,move,動く・引っ越す,待つ,乗り越える,元気づける,1
+348,put on,在宅勤務をする,始める,身に着ける,旅行する,3
+349,come,尋ねる,閉める,来る,住む,3
+350,hurry up,住む,売る,急ぐ,戻る,3
+351,ask,尋ねる,設定する・準備する,欲しいと思う,寝る,1
+352,get in,眠りに落ちる,外出する,乗り込む・入る,待つ,3
+353,have,偶然出会う,配る,開ける,持っている,4
+354,put on,動く・引っ越す,試す,早起きする,身に着ける,4
+355,turn on,〜を心配する,（電源を）つける,見る（じっと）,必要とする,2
+356,pick up,スピードを落とす,拾う・迎えに行く,（時間・お金を）使う,理解する,2
+357,need,必要とする,支払う,欲しいと思う,〜を降ろす,1
+358,make,配る,作る,待つ,〜を迎えに行く,2
+359,get over,洗う,売る,現れる・音量を上げる,乗り越える,4
+360,know,戻ってくる,乗り込む・入る,知っている,座る,3
+361,log in to the app,アプリにログインする,閉める,覚えている,提出する,1
+362,log in,ログインする,アプリにログインする,乗り越える,（用紙に）書き込む,1
+363,eat,戻る,食べる,疲れる,立ち上がる,2
+364,spend,滞在する,（時間・お金を）使う,眠りに落ちる,チェックアウトする,2
+365,go out,気分が悪い,外出する,うまくいく・解決する,持っている,2
+366,go,手伝う,世話をする,忘れる,行く,4
+367,turn down,立ち上がる,音量を下げる・断る,〜を起こす,電話する,2
+368,open up,手に入れる,シャットダウンする,打ち明ける,飲む,3
+369,save,〜に同意する,持っている,節約する・保存する,欲しいと思う,3
+370,check,書き留める,元気づける,見てみる・チェックする,確認する,4
+371,get over,拾う・迎えに行く,手に入れる,乗り越える,滞在する,3
+372,forget,売る,終える,忘れる,現れる・音量を上げる,3
+373,turn down,忘れる,座る,節約する・保存する,音量を下げる・断る,4
+374,say,言う,眠りに落ちる,チェックインする,電話する,1
+375,check in,チェックインする,立ち上がる,飲む,売る,1
+376,take,書き留める,考える,ログアウトする,取る・連れて行く,4
+377,turn down,拾う・迎えに行く,音量を下げる・断る,勉強する,見てみる・チェックする,2
+378,come,洗う,（お金が）かかる,早起きする,来る,4
+379,make,作る,配る,売る,聞こえる,1
+380,stay,アプリにログインする,考える,滞在する,立ち上がる,3
+381,cost,〜を楽しみにする,気分が悪い,（お金が）かかる,戻ってくる,3
+382,depend on,〜に頼る・依存する,見る,〜について考える,手に入れる,1
+383,see,疲れる,見る,理解する,滞在する,2
+384,get tired,聞く,疲れる,乗り越える,する,2
+385,come,来る,（時間・お金を）使う,知っている,旅行する,1
+386,go back,滞在する,戻る,取る・連れて行く,〜に所属する,2
+387,write down,書き留める,洗う,与える,〜について考える,1
+388,write down,行く,乗り込む・入る,書き留める,うまくいく・解決する,3
+389,sign up,提出する,行く,うまくいく・解決する,登録する,4
+390,worry about,掃除する,考える,伝える,〜を心配する,4
+391,open up,飲む,別れる,買う,打ち明ける,4
+392,stay up late,うまくいく・解決する,（用紙に）書き込む,住む,夜更かしする,4
+393,go out,眠りに落ちる,手に入れる,使う,外出する,4
+394,calm down,外出する,早起きする,延期する,落ち着く,4
+395,find,考える,見つける,提出する,見る,2
+396,agree with,来る,与える,〜に同意する,滞在する,3
+397,get tired,〜に頼る・依存する,疲れる,行く,夜更かしする,2
+398,check it out,〜を迎えに行く,急ぐ,料理する,見てみる・チェックする,4
+399,call,食べる,〜とうまくやる,〜に同意する,電話する,4
+400,take,取る・連れて行く,食べる,起床する,世話をする,1
+401,get up,アプリにログインする,食べる,〜とうまくやる,起床する,4
+402,give,旅行する,与える,試す,立ち寄る,2
+403,use,待つ,使う,世話をする,〜に頼る・依存する,2
+404,forget,忘れる,夜更かしする,〜を起こす,〜を迎えに行く,1
+405,pick up,起きる,拾う・迎えに行く,実行する,故障する,2
+406,call,電話する,取る・連れて行く,〜に所属する,動く・引っ越す,1
+407,come back,節約する・保存する,成長する,戻ってくる,ログアウトする,3
+408,find,見つける,登録する,使う,実行する,1
+409,listen,確認する,シャットダウンする,戻ってくる,聞く,4
+410,hang out,遊ぶ・ぶらぶらする,話題に出す・育てる,閉める,戻ってくる,1
+411,get along with,話す（言語）,登録する,会う,〜とうまくやる,4
+412,hand out,学ぶ,理解する,配る,来る,3
+413,cost,（用紙に）書き込む,（お金が）かかる,早起きする,実行する,2
+414,break down,支払う,故障する,探す,話題に出す・育てる,2
+415,wake up early,見る,起床する,世話をする,早起きする,4
+416,use,戻る,〜を起こす,見る,使う,4
+417,fill out,買う,落ち着く,欲しいと思う,（用紙に）書き込む,4
+418,carry out,音量を下げる・断る,聞こえる,ログインする,実行する,4
+419,start,立ち上がる,わかる・見つけ出す,〜について考える,始める,4
+420,break up,戻る,別れる,見る,考える,2
+421,talk,伝える,与える,見つける,話す,4
+422,slow down,（時間・お金を）使う,〜に所属する,スピードを落とす,飲む,3
+423,carry out,実行する,売る,成長する,（お金が）かかる,1
+424,wait,滞在する,疲れる,（電源を）つける,待つ,4
+425,try,〜に頼る・依存する,〜を降ろす,乗る,試す,4
+426,come back,する,戻ってくる,試す,食べる,2
+427,remember,動く・引っ越す,拾う・迎えに行く,旅行する,覚えている,4
+428,get,座る,成長する,手に入れる,見る,3
+429,stay up late,夜更かしする,世話をする,チェックインする,見つける,1
+430,forget,寝る,理解する,洗う,忘れる,4
+431,remember,起床する,準備をする,覚えている,知っている,3
+432,stay up late,（電源を）つける,聞こえる,〜を心配する,夜更かしする,4
+433,hear,持っている,聞こえる,遊ぶ・ぶらぶらする,（お金が）かかる,2
+434,go,探す,寝る,料理する,行く,4
+435,make,飲む,アプリにログインする,乗り越える,作る,4
+436,carry out,実行する,降りる,洗う,試す,1
+437,hurry up,疲れる,〜を楽しみにする,閉める,急ぐ,4
+438,pay,話題に出す・育てる,シャットダウンする,支払う,外出する,3
+439,stay,滞在する,拾う・迎えに行く,現れる,座る,1
+440,think,学ぶ,考える,気分が悪い,（用紙に）書き込む,2
+441,eat,する,世話をする,食べる,脱ぐ・離陸する,3
+442,wake up early,別れる,話す（言語）,早起きする,〜を起こす,3
+443,call off,ログインする,中止する,〜を迎えに行く,開ける,2
+444,speak,眠りに落ちる,〜に頼る・依存する,する,話す（言語）,4
+445,want,見てみる・チェックする,買う,欲しいと思う,言う,3
+446,stand up,設定する・準備する,配る,立ち上がる,試す,3
+447,listen,ログアウトする,見る,座る,聞く,4
+448,pay,支払う,音量を下げる・断る,設定する・準備する,登録する,1
+449,fill out,聞く,覚えている,（用紙に）書き込む,準備をする,3
+450,belong to,考える,探す,乗り込む・入る,〜に所属する,4
+451,drop by,（お金が）かかる,節約する・保存する,立ち寄る,探す,3
+452,open,持っている,開ける,気分が良くなる,知っている,2
+453,turn off,手伝う,休憩する,（電源を）消す,〜を心配する,3
+454,listen,降りる,登録する,聞く,試す,3
+455,remember,〜を降ろす,必要とする,節約する・保存する,覚えている,4
+456,cook,わかる・見つけ出す,料理する,提出する,〜を心配する,2
+457,turn up,売る,急ぐ,現れる・音量を上げる,シャットダウンする,3
+458,set up,必要とする,設定する・準備する,試す,〜を降ろす,2
+459,set up,持っている,ログインする,設定する・準備する,〜に所属する,3
+460,write down,飲む,成長する,書き留める,早起きする,3
+461,find out,わかる・見つけ出す,伝える,見る,〜について考える,1
+462,look for,探す,ログインする,使う,理解する,1
+463,remember,現れる,理解する,戻る,覚えている,4
+464,spend,元気づける,知っている,（時間・お金を）使う,する,3
+465,try,試す,登録する,世話をする,〜に同意する,1
+466,hang out,書き留める,〜を起こす,遊ぶ・ぶらぶらする,掃除する,3
+467,get,手に入れる,うまくいく・解決する,〜を起こす,落ち着く,1
+468,meet,（電源を）消す,うまくいく・解決する,洗う,会う,4
+469,wake up early,早起きする,〜とうまくやる,急ぐ,話す,1
+470,fill out,提出する,世話をする,アプリにログインする,（用紙に）書き込む,4
+471,get ready,準備をする,試す,滞在する,住む,1
+472,run into,偶然出会う,見る,疲れる,延期する,1
+473,go,使う,見てみる・チェックする,起きる,行く,4
+474,try,気分が良くなる,試す,世話をする,配る,2
+475,do,する,疲れる,〜とうまくやる,学ぶ,1
+476,speak,話題に出す・育てる,話す（言語）,覚えている,勉強する,2
+477,cheer up,元気づける,（時間・お金を）使う,旅行する,登録する,1
+478,turn on,〜に所属する,取る・連れて行く,（電源を）つける,世話をする,3
+479,do,〜を楽しみにする,料理する,外出する,する,4
+480,learn,学ぶ,理解する,世話をする,（電源を）つける,1
+481,think about,支払う,（電源を）消す,考える,〜について考える,4
+482,talk,必要とする,持っている,話す,戻ってくる,3
+483,take off,脱ぐ・離陸する,降りる,聞く,終える,1
+484,turn down,準備をする,（電源を）つける,起床する,音量を下げる・断る,4
+485,find out,立ち寄る,乗り込む・入る,わかる・見つけ出す,学ぶ,3
+486,use,現れる,使う,世話をする,言う,2
+487,ask,支払う,うまくいく・解決する,休憩する,尋ねる,4
+488,hang out,わかる・見つけ出す,〜を起こす,伝える,遊ぶ・ぶらぶらする,4
+489,open,開ける,〜に所属する,取る・連れて行く,身に着ける,1
+490,hand in,提出する,戻る,起きる,節約する・保存する,1
+491,turn down,行く,音量を下げる・断る,見てみる・チェックする,〜を心配する,2
+492,run into,来る,登録する,偶然出会う,話す（言語）,3
+493,write down,降りる,（お金が）かかる,書き留める,待つ,3
+494,get over,〜に所属する,眠りに落ちる,乗り越える,覚えている,3
+495,meet,持っている,来る,〜について考える,会う,4
+496,drop someone off,〜を降ろす,探す,飲む,作る,1
+497,get up,見つける,起床する,旅行する,準備をする,2
+498,finish,買う,中止する,終える,（電源を）消す,3
+499,open,見る,アプリにログインする,見てみる・チェックする,開ける,4
+500,show up,食べる,座る,現れる,現れる・音量を上げる,3`;
+
+// Parse the CSV data immediately
+let allQuestions = parseQuizCSV(quizCSVData);
+
+// Select random questions for the session
+let vocabulary = [];
+
+// App state
+let currentScreen = 'registration';
+let username = '';
+let currentQuestionIndex = 0;
+let correctAnswers = 0;
+let totalAnswers = 0;
+let startTime = null;
+let questionStartTime = null;
+let todayTotalCorrect = 0; // Today's cumulative correct answers
+let totalLifetimeCorrect = 0; // Lifetime cumulative correct answers
+let previousLevel = 1; // Previous level before this session
+let usedQuestionIds = []; // Track used questions to avoid repeats
+
+// DOM elements
+const registrationScreen = document.getElementById('registration-screen');
+const startScreen = document.getElementById('start-screen');
+const quizScreen = document.getElementById('quiz-screen');
+const resultsScreen = document.getElementById('results-screen');
+const levelupScreen = document.getElementById('levelup-screen');
+
+const usernameInput = document.getElementById('username-input');
+const registerBtn = document.getElementById('register-btn');
+const startBtn = document.getElementById('start-btn');
+const viewResultsBtn = document.getElementById('view-results-btn');
+const finishBtn = document.getElementById('finish-btn');
+const endBtn = document.getElementById('end-btn');
+
+const wordDisplay = document.getElementById('word-display');
+const choiceBtns = document.querySelectorAll('.choice-btn');
+const correctCountEl = document.getElementById('correct-count');
+const totalCountEl = document.getElementById('total-count');
+const totalCountFractionEl = document.getElementById('total-count-fraction');
+const timeSpentEl = document.getElementById('time-spent');
+
+const quizUsernameEl = document.getElementById('quiz-username');
+const resultsUsernameEl = document.getElementById('results-username');
+const levelupUsernameEl = document.getElementById('levelup-username');
+
+const userRankEl = document.getElementById('user-rank');
+const rankingListEl = document.getElementById('ranking-list');
+const levelupTextEl = document.getElementById('levelup-text');
+
+// Initialize app
+function init() {
+    // Check if username exists in localStorage
+    const savedUsername = localStorage.getItem('username');
+    if (savedUsername) {
+        username = savedUsername;
+        showScreen('start');
+    } else {
+        showScreen('registration');
+    }
+    
+    // Load today's cumulative score and lifetime score
+    loadTodayScore();
+    loadLifetimeScore();
+    
+    // Event listeners
+    registerBtn.addEventListener('click', handleRegistration);
+    startBtn.addEventListener('click', startQuiz);
+    viewResultsBtn.addEventListener('click', showResults);
+    finishBtn.addEventListener('click', handleFinish);
+    endBtn.addEventListener('click', () => showScreen('start'));
+    
+    choiceBtns.forEach((btn, index) => {
+        btn.addEventListener('click', () => handleAnswer(index));
+    });
+}
+
+// Get today's date as string (YYYY-MM-DD)
+function getTodayDateString() {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
+}
+
+// Load today's cumulative score
+function loadTodayScore() {
+    const today = getTodayDateString();
+    const scoreKey = `score_${username}_${today}`;
+    const savedScore = localStorage.getItem(scoreKey);
+    todayTotalCorrect = savedScore ? parseInt(savedScore) : 0;
+}
+
+// Save today's cumulative score
+function saveTodayScore() {
+    const today = getTodayDateString();
+    const scoreKey = `score_${username}_${today}`;
+    localStorage.setItem(scoreKey, todayTotalCorrect.toString());
+}
+
+// Load lifetime cumulative score
+function loadLifetimeScore() {
+    const lifetimeKey = `lifetime_${username}`;
+    const savedScore = localStorage.getItem(lifetimeKey);
+    totalLifetimeCorrect = savedScore ? parseInt(savedScore) : 0;
+    previousLevel = calculateLevel(totalLifetimeCorrect);
+}
+
+// Save lifetime cumulative score
+function saveLifetimeScore() {
+    const lifetimeKey = `lifetime_${username}`;
+    localStorage.setItem(lifetimeKey, totalLifetimeCorrect.toString());
+}
+
+// Calculate level from total correct answers
+function calculateLevel(totalCorrect) {
+    return Math.floor(totalCorrect / 10) + 1;
+}
+
+// Check if user leveled up
+function checkLevelUp() {
+    const newLevel = calculateLevel(totalLifetimeCorrect);
+    return newLevel > previousLevel ? newLevel : null;
+}
+
+// Show screen
+function showScreen(screen) {
+    registrationScreen.classList.add('hidden');
+    startScreen.classList.add('hidden');
+    quizScreen.classList.add('hidden');
+    resultsScreen.classList.add('hidden');
+    levelupScreen.classList.add('hidden');
+    
+    switch(screen) {
+        case 'registration':
+            registrationScreen.classList.remove('hidden');
+            break;
+        case 'start':
+            startScreen.classList.remove('hidden');
+            break;
+        case 'quiz':
+            quizScreen.classList.remove('hidden');
+            quizUsernameEl.textContent = username + 'さん';
+            break;
+        case 'results':
+            resultsScreen.classList.remove('hidden');
+            resultsUsernameEl.textContent = username + 'さん';
+            break;
+        case 'levelup':
+            levelupScreen.classList.remove('hidden');
+            levelupUsernameEl.textContent = username + 'さん';
+            break;
+    }
+    
+    currentScreen = screen;
+}
+
+// Handle registration
+function handleRegistration() {
+    const name = usernameInput.value.trim();
+    if (name) {
+        username = name;
+        localStorage.setItem('username', name);
+        loadTodayScore();
+        loadLifetimeScore();
+        showScreen('start');
+    }
+}
+
+// Get next random question (avoiding all used questions in current session)
+function getNextRandomQuestion() {
+    // Check if we have questions loaded
+    if (!allQuestions || allQuestions.length === 0) {
+        console.error('No questions available');
+        return null;
+    }
+    
+    // Filter out all questions used in this session
+    const availableQuestions = allQuestions.filter((q, idx) => !usedQuestionIds.includes(idx));
+    
+    // If all questions have been used, reset
+    if (availableQuestions.length === 0) {
+        usedQuestionIds = [];
+        return getNextRandomQuestion();
+    }
+    
+    // Select random question from available ones
+    const randomIndex = Math.floor(Math.random() * availableQuestions.length);
+    const selectedQuestion = availableQuestions[randomIndex];
+    
+    // Find original index and mark as used in this session
+    const originalIndex = allQuestions.indexOf(selectedQuestion);
+    usedQuestionIds.push(originalIndex);
+    
+    return selectedQuestion;
+}
+
+// Start quiz
+function startQuiz() {
+    currentQuestionIndex = 0;
+    correctAnswers = 0; // Reset session correct answers
+    totalAnswers = 0;
+    startTime = Date.now();
+    usedQuestionIds = []; // Reset used questions
+    
+    // Start with one random question
+    const firstQuestion = getNextRandomQuestion();
+    if (!firstQuestion) {
+        console.error('Failed to start quiz: no questions available');
+        alert('問題の読み込みに失敗しました');
+        return;
+    }
+    vocabulary = [firstQuestion];
+    
+    showScreen('quiz');
+    loadQuestion();
+}
+
+// Load question
+function loadQuestion() {
+    // Make sure we have a question
+    if (currentQuestionIndex >= vocabulary.length) {
+        const nextQuestion = getNextRandomQuestion();
+        if (nextQuestion) {
+            vocabulary.push(nextQuestion);
+        } else {
+            console.error('Failed to get next question');
+            return;
+        }
+    }
+    
+    const question = vocabulary[currentQuestionIndex];
+    if (!question) {
+        console.error('No question at index', currentQuestionIndex);
+        return;
+    }
+    
+    wordDisplay.textContent = question.word;
+    
+    // Create shuffled choices
+    const choices = [question.correct, ...question.options];
+    const shuffledChoices = shuffleArray(choices);
+    
+    // Update choice buttons
+    choiceBtns.forEach((btn, index) => {
+        btn.classList.remove('correct', 'incorrect', 'disabled');
+        const choiceText = btn.querySelector('.choice-text');
+        choiceText.textContent = shuffledChoices[index];
+        btn.dataset.answer = shuffledChoices[index];
+    });
+    
+    questionStartTime = Date.now();
+}
+
+// Handle answer
+function handleAnswer(index) {
+    const selectedBtn = choiceBtns[index];
+    const selectedAnswer = selectedBtn.dataset.answer;
+    const question = vocabulary[currentQuestionIndex];
+    const isCorrect = selectedAnswer === question.correct;
+    
+    // Disable all buttons
+    choiceBtns.forEach(btn => btn.classList.add('disabled'));
+    
+    // Show feedback
+    if (isCorrect) {
+        selectedBtn.classList.add('correct');
+        correctAnswers++;
+    } else {
+        selectedBtn.classList.add('incorrect');
+        // Highlight correct answer
+        choiceBtns.forEach(btn => {
+            if (btn.dataset.answer === question.correct) {
+                btn.classList.add('correct');
+            }
+        });
+    }
+    
+    totalAnswers++;
+    
+    // Move to next question after 1 second
+    setTimeout(() => {
+        // Add a new random question
+        const nextQuestion = getNextRandomQuestion();
+        if (nextQuestion) {
+            vocabulary.push(nextQuestion);
+        }
+        currentQuestionIndex++;
+            loadQuestion();
+    }, 1000);
+}
+
+// Show results
+function showResults() {
+    const endTime = Date.now();
+    const timeSpent = Math.floor((endTime - startTime) / 1000);
+    
+    // Update today's cumulative score
+    todayTotalCorrect += correctAnswers;
+    saveTodayScore();
+    
+    // Update lifetime cumulative score
+    totalLifetimeCorrect += correctAnswers;
+    saveLifetimeScore();
+    
+    correctCountEl.textContent = correctAnswers;
+    totalCountFractionEl.textContent = totalAnswers;
+    totalCountEl.textContent = totalAnswers;
+    timeSpentEl.textContent = timeSpent;
+    
+    // Load and display ranking
+    loadRanking();
+    
+    // Check if user leveled up and update button text
+    const newLevel = checkLevelUp();
+    if (newLevel) {
+        finishBtn.textContent = '次へ';
+    } else {
+        finishBtn.textContent = '終了する';
+    }
+    
+    showScreen('results');
+}
+
+// Handle finish button click
+function handleFinish() {
+    const newLevel = checkLevelUp();
+    if (newLevel) {
+        // Show level up screen
+        levelupTextEl.textContent = `レベル${newLevel}になりました！`;
+        previousLevel = newLevel; // Update previous level
+        // Update username display on level-up screen
+        if (levelupUsernameEl) {
+            levelupUsernameEl.textContent = username;
+        }
+        showScreen('levelup');
+    } else {
+        // Go back to start screen
+        showScreen('start');
+    }
+}
+
+// CSV data embedded
+const csvData = `Name,Score
+Tanaka Ryo,34
+佐藤Aki,89
+yuki_23,17
+山本Haruto,56
+Mei.kondo,72
+Hiroshi_7,8
+中村ゆう,95
+sakurai.M,43
+リンタロウ56,64
+Toma_aki,21
+渡辺玲奈,12
+yu_suzuki88,100
+今井Shun,42
+Misaki34,6
+Ishida光,27
+Arisa.k,97
+だいち009,53
+Kana.Y,81
+斎藤Kou,15
+Makoto_3,74
+千葉Leo,38
+Hikari,90
+shiro_112,59
+工藤nao,4
+tomo1998,68
+Ren.G,94
+斉藤Kei,7
+yuika77,57
+matsu_daichi,23
+Koharu.01,82
+高橋jun,29
+Kazuki_81,63
+Rina84,11
+Haru.m,54
+Kaito-Rei,78
+ふじもと修,36
+Yu_to33,16
+miu_02,92
+田中翔太,9
+Rio.chan,65
+aoi_321,88
+MatsuiRen,44
+さくら_S,73
+Tsubasa08,31
+近藤タカ,2
+7_miku,58
+Rei_T,80
+みなと32,96
+Shizuku09,19
+hashimoto46,75
+yuji_001,28
+Kanae.M,99
+須藤Kai,13
+NOA777,70
+Misato_R,46
+鈴木りお,1
+Kenjiro94,67
+AYA009,83
+Yamato33,41
+rei.na,60
+HayatoXR,134
+中川亮平,201
+Mika_Zero,158
+Satoshi_88,245
+HarukaS,310
+Kuroki_12,122
+Yuzuha_0,115
+大谷Kento,303
+Sakura555,288
+Koji_2000,170
+Minami33,147
+Kaito999,254
+nana.mori,187
+Riku—S,221
+Shunpei,198
+三浦K,141
+Ren_44,119
+井上Haruma,230
+SakiT,129
+Taiga55,180
+matsu_ken,352
+HonokaR,260
+ありさ88,214
+Yu-suke3,275
+Hoshino22,160
+KAI_11,189
+Marina777,145
+yuu_200,320
+Akari_x,301
+高瀬Ryuto,172
+ももか3,118
+TakeruN,90
+Jin-082,44
+HarutoXT,67
+あやの2024,32
+seiji.k,55
+MISORA09,98
+Takuya_L,20`;
+
+// Load CSV and display ranking
+function loadRanking() {
+    try {
+        // Parse CSV
+        const lines = csvData.trim().split('\n');
+        const users = [];
+        
+        // Skip header row
+        for (let i = 1; i < lines.length; i++) {
+            const [name, score] = lines[i].split(',');
+            if (name && score) {
+                users.push({
+                    name: name.trim(),
+                    score: parseInt(score.trim())
+                });
+            }
+        }
+        
+        // Add current user with today's cumulative score
+        users.push({
+            name: username,
+            score: todayTotalCorrect
+        });
+        
+        // Sort by score (descending - highest first)
+        users.sort((a, b) => b.score - a.score);
+        
+        // Calculate ranks with ties
+        const rankedUsers = [];
+        let currentRank = 1;
+        for (let i = 0; i < users.length; i++) {
+            if (i > 0 && users[i].score < users[i - 1].score) {
+                currentRank = i + 1; // Skip ranks for tied users
+            }
+            rankedUsers.push({
+                ...users[i],
+                rank: currentRank
+            });
+        }
+        
+        // Find user's rank
+        const userEntry = rankedUsers.find(u => u.name === username);
+        const userRank = userEntry ? userEntry.rank : 1;
+        const totalUsers = users.length;
+        
+        // Update rank display
+        userRankEl.textContent = userRank;
+        document.querySelector('.rank-total').textContent = `(${totalUsers}人中)`;
+        
+        // Display ranking list (show all users with ranks)
+        displayRankingList(rankedUsers, username);
+        
+    } catch (error) {
+        console.error('Error loading ranking:', error);
+    }
+}
+
+// Display ranking list
+function displayRankingList(rankedUsers, currentUsername) {
+    rankingListEl.innerHTML = '';
+    
+    // Display all users with their ranks
+    for (let i = 0; i < rankedUsers.length; i++) {
+        const user = rankedUsers[i];
+        const rankingItem = createRankingItem(user.rank, user.name, user.score, user.name === currentUsername);
+        rankingListEl.appendChild(rankingItem);
+    }
+    
+    // Scroll to current user's position after rendering
+    setTimeout(() => {
+        const currentUserItem = rankingListEl.querySelector('.current-user');
+        if (currentUserItem) {
+            currentUserItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }, 100);
+}
+
+// Create ranking item element
+function createRankingItem(position, name, score, isCurrentUser) {
+    const item = document.createElement('div');
+    item.className = 'ranking-item' + (isCurrentUser ? ' current-user' : '');
+    
+    item.innerHTML = `
+        <div class="ranking-item-left">
+            <span class="ranking-position">${position}</span>
+            <span class="ranking-name">${name}</span>
+        </div>
+        <span class="ranking-score">${score}問</span>
+    `;
+    
+    return item;
+}
+
+// Utility: Shuffle array
+function shuffleArray(array) {
+    const newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    }
+    return newArray;
+}
+
+// Start app
+init();
